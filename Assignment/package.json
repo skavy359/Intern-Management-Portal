@@ -1,0 +1,29 @@
+{
+  "name": "intern-management-portal",
+  "version": "1.0.0",
+  "description": "Intern Management & Training Portal - Backend API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node --test",
+    "seed": "node migrations/seed.js",
+    "migrate": "node migrations/run-migration.js"
+  },
+  "keywords": ["intern", "management", "portal", "express", "mysql"],
+  "author": "Kavy",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^18.0.3",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.24.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

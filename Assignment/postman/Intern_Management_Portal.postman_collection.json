@@ -1,0 +1,757 @@
+{
+  "info": {
+    "name": "Intern Management Portal",
+    "description": "Complete API collection for the Intern Management & Training Portal.\n\nCredentials:\n- Admin: kavy@example.com / Admin@123\n- Intern: rahul@example.com / Intern@123",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "internToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "internId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login as Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('token', response.data.token);",
+                  "    pm.test('Login successful', () => {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data.user.role).to.equal('Admin');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kavy@example.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login as Intern",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('internToken', response.data.token);",
+                  "    pm.test('Intern login successful', () => {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rahul@example.com\",\n  \"password\": \"Intern@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Invalid Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kavy@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Missing Credentials",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Invalid Email Format",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"notanemail\",\n  \"password\": \"test\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Interns - CRUD",
+      "item": [
+        {
+          "name": "List All Interns",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"]
+            }
+          }
+        },
+        {
+          "name": "List All Interns (Including Disabled - Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns?all=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"],
+              "query": [
+                { "key": "all", "value": "true" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Intern by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "1"]
+            }
+          }
+        },
+        {
+          "name": "Create Intern (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('internId', response.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Intern\",\n  \"email\": \"test.intern@example.com\",\n  \"role\": \"Backend Intern\",\n  \"password\": \"Test@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"]
+            }
+          }
+        },
+        {
+          "name": "Update Intern (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Intern Updated\",\n  \"email\": \"test.intern@example.com\",\n  \"role\": \"Frontend Intern\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/{{internId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "{{internId}}"]
+            }
+          }
+        },
+        {
+          "name": "Disable Intern (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/{{internId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "{{internId}}"]
+            }
+          }
+        },
+        {
+          "name": "Enable Intern (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/{{internId}}/enable",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "{{internId}}", "enable"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search & Pagination",
+      "item": [
+        {
+          "name": "Search Interns",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/search?keyword=kavy",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "search"],
+              "query": [
+                { "key": "keyword", "value": "kavy" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search - No Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/search?keyword=nonexistent",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "search"],
+              "query": [
+                { "key": "keyword", "value": "nonexistent" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Pagination - Page 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns?limit=2&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"],
+              "query": [
+                { "key": "limit", "value": "2" },
+                { "key": "offset", "value": "0" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Pagination - Page 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns?limit=2&offset=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"],
+              "query": [
+                { "key": "limit", "value": "2" },
+                { "key": "offset", "value": "2" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Validation Errors",
+      "item": [
+        {
+          "name": "Create - Missing Name",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"role\": \"Backend Intern\",\n  \"password\": \"Test@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"]
+            }
+          }
+        },
+        {
+          "name": "Create - Invalid Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test\",\n  \"email\": \"notanemail\",\n  \"role\": \"Backend Intern\",\n  \"password\": \"Test@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"]
+            }
+          }
+        },
+        {
+          "name": "Create - Invalid Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test\",\n  \"email\": \"test@example.com\",\n  \"role\": \"CEO\",\n  \"password\": \"Test@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"]
+            }
+          }
+        },
+        {
+          "name": "Create - Short Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test\",\n  \"email\": \"test@example.com\",\n  \"role\": \"Backend Intern\",\n  \"password\": \"abc\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"]
+            }
+          }
+        },
+        {
+          "name": "Get - Invalid ID (string)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "abc"]
+            }
+          }
+        },
+        {
+          "name": "Get - Invalid ID (negative)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/-1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "-1"]
+            }
+          }
+        },
+        {
+          "name": "Pagination - Invalid Limit",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns?limit=-5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"],
+              "query": [
+                { "key": "limit", "value": "-5" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Pagination - Excessive Limit",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns?limit=500",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"],
+              "query": [
+                { "key": "limit", "value": "500" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search - Missing Keyword",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "search"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authorization Tests",
+      "item": [
+        {
+          "name": "Unauthenticated Request",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"]
+            }
+          }
+        },
+        {
+          "name": "Invalid Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer invalidtoken123" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"]
+            }
+          }
+        },
+        {
+          "name": "Intern Creating Intern (Forbidden)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{internToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Unauthorized\",\n  \"email\": \"unauth@example.com\",\n  \"role\": \"Backend Intern\",\n  \"password\": \"Test@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"]
+            }
+          }
+        },
+        {
+          "name": "Intern Deleting Intern (Forbidden)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{internToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "2"]
+            }
+          }
+        },
+        {
+          "name": "Intern Accessing Dashboard (Forbidden)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{internToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Admin Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Conflict & Error Cases",
+      "item": [
+        {
+          "name": "Create - Duplicate Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Duplicate\",\n  \"email\": \"kavy@example.com\",\n  \"role\": \"Backend Intern\",\n  \"password\": \"Test@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns"]
+            }
+          }
+        },
+        {
+          "name": "Get - Non-existent ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "99999"]
+            }
+          }
+        },
+        {
+          "name": "Update - Non-existent ID",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ghost\",\n  \"email\": \"ghost@example.com\",\n  \"role\": \"Backend Intern\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "99999"]
+            }
+          }
+        },
+        {
+          "name": "Delete - Non-existent ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "99999"]
+            }
+          }
+        },
+        {
+          "name": "Unknown Route",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/nonexistent",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "nonexistent"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile Management",
+      "item": [
+        {
+          "name": "Update Own Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{internToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Updated\",\n  \"email\": \"rahul@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{internToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Intern@123\",\n  \"newPassword\": \"NewIntern@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/interns/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "interns", "change-password"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

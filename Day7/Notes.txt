@@ -1,0 +1,15 @@
+GET - Getting the resources
+POST - Creating new resource 
+PUT - Replacing/Updating a resource
+PATCH - Modifying the resource partially
+DELETE - Soft Delete Preferred
+
+STATUS CODES
+200 - OK
+201 - CREATED
+400 - BAD REQUEST
+401 - UNAUTHORISED
+403 - FORBIDDEN
+404 - RESOURCE NOT FOUND
+409 - CONFLICT
+500 - INTERNAL SERVER ERROR
